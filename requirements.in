@@ -1,0 +1,4 @@
+# d.py optional deps: https://github.com/Rapptz/discord.py/blob/e1b6310ef387481a654a1085653a33aa1b17e034/pyproject.toml#L38-L69
+# NOTE: Do not use speed extras on Windows
+
+discord.py
