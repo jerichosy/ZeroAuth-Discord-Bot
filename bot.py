@@ -1,5 +1,6 @@
 import logging
 
+import aiohttp
 import discord
 from discord.ext import commands
 
@@ -21,7 +22,7 @@ class ZeroAuth(commands.Bot):
     async def setup_hook(self) -> None:
         log.info("--SETUP HOOK--")
 
-        # self.session = aiohttp.ClientSession()
+        self.session = aiohttp.ClientSession()
 
         self.invite_url = discord.utils.oauth_url(self.client_id)
         log.info(f"Invite URL: {self.invite_url}")
@@ -29,7 +30,7 @@ class ZeroAuth(commands.Bot):
         for extension in initial_extensions:
             try:
                 await self.load_extension(extension)
-            except Exception as e:
+            except Exception:
                 log.exception("Failed to load extension %s.", extension)
 
     async def on_ready(self):

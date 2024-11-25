@@ -2,3 +2,4 @@
 # NOTE: Do not use speed extras on Windows
 
 discord.py
+aiohttp
