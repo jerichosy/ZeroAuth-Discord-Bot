@@ -7,7 +7,7 @@ import config
 
 log = logging.getLogger(__name__)
 
-initial_extensions = ("cogs.meta",)
+initial_extensions = ("cogs.meta", "cogs.zt")
 
 
 class ZeroAuth(commands.Bot):
