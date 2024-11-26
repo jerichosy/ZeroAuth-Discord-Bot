@@ -2,7 +2,13 @@
 
 Authorization helper for friends in our ZeroTier network
 
-Configuration of this bot is done by creating a `config.py` file in the root directory where the bot is with the following template:
+### Setup
+
+1. Clone/download this repo.
+
+2. Use a virtual environment (`python -m venv venv`) and install the dependencies using `pip install -r requirements.txt`
+
+3. Configuration of this bot is done by creating a `config.py` file in the root directory where the bot is with the following template:
 
 ```python
 # Discord Bot
@@ -20,3 +26,5 @@ ztnet_api_token = "" # your ZTNET Rest API access token
 ztnet_api_url = "" # your ZTNET Rest API url with `/api/v1` at the end
 ztnet_orgid = "" # your ZTNET network's organization ID
 ```
+
+4. Run the bot using `python bot.py`
