@@ -1,5 +1,6 @@
 import logging
 from pprint import pformat
+from typing import List, NamedTuple
 
 import discord
 from discord import app_commands
@@ -10,20 +11,42 @@ import config
 log = logging.getLogger(__name__)
 
 
+class JoinableNetwork(NamedTuple):
+    name: str
+    network_id: str
+
+    def __str__(self) -> str:
+        return f"{self.name} (ID: {self.network_id})"
+
+    @property
+    def markdown(self) -> str:
+        return f"{self.name} (ID: `{self.network_id}`)"
+
+
 class ZT(commands.GroupCog, name="zt"):
     def __init__(self, bot):
         self.bot = bot
-        self.joinable_networks = config.joinable_networks
+        self.joinable_networks = [JoinableNetwork(**network) for network in config.joinable_networks]
 
     # TODO: Make sure this cog is only usable in guilds
 
     @app_commands.command()
     async def listnetworks(self, interaction: discord.Interaction):
         """Show the joinable ZeroTier networks"""
-        joinable_networks = [f"- {network['name']} (ID: `{network['id']}`)" for network in self.joinable_networks]
-        await interaction.response.send_message("Joinable ZeroTier networks:\n" + "\n".join(joinable_networks))
+        joinable_networks_formatted = [f"- {network.markdown}" for network in self.joinable_networks]
+        await interaction.response.send_message("Joinable ZeroTier networks:\n" + "\n".join(joinable_networks_formatted))
+
+    async def network_id_autocomplete(
+        self, interaction: discord.Interaction, current: str
+    ) -> List[app_commands.Choice[str]]:
+        return [
+            app_commands.Choice(name=str(network), value=network.network_id)
+            for network in self.joinable_networks
+            if current.lower() in str(network).lower()
+        ]
 
     @app_commands.command()
+    @app_commands.autocomplete(network_id=network_id_autocomplete)
     @app_commands.describe(
         network_id="The ZeroTier network you joined",
         member_id='Your ZeroTier address. You can find this in System Tray ➔ ZeroTier ➔ "My Address"',
