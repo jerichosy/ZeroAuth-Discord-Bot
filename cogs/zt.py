@@ -1,4 +1,6 @@
 import logging
+import traceback
+from datetime import datetime
 from pprint import pformat
 from typing import List, NamedTuple
 
@@ -86,6 +88,9 @@ class ZT(commands.GroupCog, name="zt"):
 
             if resp.status == 200:  # ✅ checked and tested
                 await interaction.followup.send("🟢 You have been authorized on the ZeroTier network.")
+                await self.post_auth_webhook(
+                    resp_json["name"], member_id, interaction.user, (await interaction.original_response()).jump_url
+                )
             elif resp.status == 401:  # ✅ checked and tested (triggers on invalid input)
                 await interaction.followup.send(f"🔴 {resp_json["error"]}")
             elif resp.status == 429:  # ✅ checked
@@ -99,6 +104,33 @@ class ZT(commands.GroupCog, name="zt"):
                     f"🔴 Unexpected error. **Please inform the admin of the following:**\n```\n{resp.status} {resp.reason}\n{resp_json["error"]}\n```"
                 )
                 await webhookmsg.delete(delay=10)
+
+    async def post_auth_webhook(self, name, address, member: discord.Member, url):
+        try:
+            # Set up Webhook
+            webhook = discord.Webhook.from_url(config.webhook_url, client=self.bot)
+
+            # Create embed
+            embed = discord.Embed(
+                title="Self Member Authorization",
+                description=f"{member.mention} has authorized **{name}** on the ZeroTier network using this bot.",
+                color=0x00FF00,
+                timestamp=datetime.now(),
+            )
+
+            # Add fields
+            embed.add_field(name="Name", value=name, inline=True)
+            embed.add_field(name="ID/Address", value=address, inline=True)
+
+            embed.set_author(name=member.name, icon_url=member.avatar.url, url=url)
+
+            # Send the embed using the webhook
+            await webhook.send(embed=embed)
+        except BaseException:
+            log.error(f"Failed to send audit log webhook for self-auth of {name} ({address})")
+            log.error(traceback.format_exc())
+        else:
+            log.info(f"Sent audit log webhook for self-auth of {name} ({address})")
 
 
 async def setup(bot):
