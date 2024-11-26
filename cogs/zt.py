@@ -28,8 +28,6 @@ class ZT(commands.GroupCog, name="zt"):
         self.bot = bot
         self.joinable_networks = [JoinableNetwork(**network) for network in config.joinable_networks]
 
-    # TODO: Make sure this cog is only usable in guilds
-
     @app_commands.command()
     async def listnetworks(self, interaction: discord.Interaction):
         """Show the joinable ZeroTier networks"""
@@ -61,7 +59,7 @@ class ZT(commands.GroupCog, name="zt"):
         # NOTE: This does leak memberIds to other members in the Discord server. We can avoid this by using a modal.
         # ? If we allow admins to auth members through here instead of ZTNET, add a name arg to the coommand.
         #   We must also maintain a list of admins's Discord IDs in the config file.
-        # TODO: Test for invalid inputs (if possible) after finalizing input strategy
+        # * Test for invalid inputs (if possible) if changing input strategy
 
         # https://ztnet.network/Rest%20Api/Organization/Network-Members/modify-a-organization-network-member
 

@@ -2,6 +2,7 @@ import logging
 
 import aiohttp
 import discord
+from discord import app_commands
 from discord.ext import commands
 
 import config
@@ -14,8 +15,16 @@ initial_extensions = ("cogs.meta", "cogs.zt")
 class ZeroAuth(commands.Bot):
     def __init__(self):
         intents = discord.Intents.default()
-        intents.dm_messages = False  # ! TODO: Make sure to disable interactions in DMs as well.
-        super().__init__(command_prefix=commands.when_mentioned, intents=intents)
+        intents.dm_messages = False  # Disable receiving of DM messages (e.g., commands) but can still send
+        super().__init__(
+            command_prefix=commands.when_mentioned,
+            intents=intents,
+            allowed_contexts=app_commands.AppCommandContext(
+                dm_channel=False,  # Prevents syncing of app cmds to DMs
+                guild=True,  # * Only allow guild usage of this bot so admins can see
+                private_channel=False,  # Prevents syncing of app cmds to DMs/GDMs
+            ),
+        )
 
         self.client_id: str = config.client_id
 
