@@ -60,17 +60,15 @@ class ZT(commands.GroupCog, name="zt"):
 
             if resp.status == 200:  # ✅ checked and tested
                 await interaction.followup.send("🟢 You have been authorized on the ZeroTier network.")
-            elif resp.status == 401:  # ✅ checked
-                await interaction.followup.send(
-                    # "🔴 Unauthorized. Your request has not been applied. **Please inform the admin of the error.**"
-                    f"🔴 {resp_json["error"]} Your request has not been applied. **Please inform the admin of the error.**"
-                )
+            elif resp.status == 401:  # ✅ checked and tested (triggers on invalid input)
+                await interaction.followup.send(f"🔴 {resp_json["error"]}")
             elif resp.status == 429:  # ✅ checked
                 # await interaction.followup.send("🔴 Too many requests. Please try again later.")
                 await interaction.followup.send(f"🔴 {resp_json["error"]}")
             elif resp.status == 500:  # ✅ checked
-                await interaction.followup.send("🔴 Internal server error. Please try again later.")
-            else:  # ✅ checked and tested
+                # await interaction.followup.send("🔴 Internal server error. Please try again later.")
+                await interaction.followup.send(f"🔴 {resp_json["error"]}")
+            else:  # ✅ checked and tested (triggers when payload is NOT passed as JSON)
                 webhookmsg = await interaction.followup.send(
                     f"🔴 Unexpected error. **Please inform the admin of the following:**\n```\n{resp.status} {resp.reason}\n{resp_json["error"]}\n```"
                 )
