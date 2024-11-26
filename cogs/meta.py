@@ -10,6 +10,18 @@ class Meta(commands.Cog):
         self.bot = bot
 
     @commands.command()
+    @commands.is_owner()
+    async def invite(self, ctx: commands.Context):
+        try:
+            await ctx.author.send(
+                f"⚠️ __**Only add to servers with members you trust!**__\nInvite link: {self.bot.invite_url}"
+            )
+        except:
+            await ctx.reply("Could not DM you.")
+        else:
+            await ctx.reply("📩 Slid into your DMs")
+
+    @commands.command()
     async def ping(self, ctx):
         start = time.perf_counter()
         message = await ctx.send("Ping...")
