@@ -51,7 +51,12 @@ class ZT(commands.GroupCog, name="zt"):
         network_id="The ZeroTier network you joined",
         member_id='Your ZeroTier address. You can find this in System Tray ➔ ZeroTier ➔ "My Address"',
     )
-    async def auth(self, interaction: discord.Interaction, network_id: str, member_id: str):
+    async def auth(
+        self,
+        interaction: discord.Interaction,
+        network_id: app_commands.Range[str, 16, 16],
+        member_id: app_commands.Range[str, 10, 10],
+    ):
         """Authorize yourself on the ZeroTier network"""
         # NOTE: This does leak memberIds to other members in the Discord server. We can avoid this by using a modal.
         # ? If we allow admins to auth members through here instead of ZTNET, add a name arg to the coommand.
