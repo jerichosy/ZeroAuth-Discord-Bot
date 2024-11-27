@@ -16,10 +16,16 @@ FROM python:3.12-slim-bookworm AS runner
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
+RUN groupadd -r zeroauth && useradd -r -g zeroauth zeroauth
+
 COPY --from=builder /opt/venv /opt/venv
+RUN chown -R zeroauth:zeroauth /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 
 WORKDIR /app
 COPY . .
+RUN chown -R zeroauth:zeroauth /app
+
+USER zeroauth
 
 CMD ["python", "bot.py"]
