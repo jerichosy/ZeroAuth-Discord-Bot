@@ -1,0 +1,13 @@
+name: ZeroAuth
+
+services:
+  bot:
+    build:
+      context: .
+      target: runner
+    volumes:
+      - type: bind
+        source: ./config.py
+        target: /app/config.py
+        read_only: true
+    restart: unless-stopped
