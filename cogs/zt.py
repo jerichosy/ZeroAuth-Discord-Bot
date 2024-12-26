@@ -30,6 +30,9 @@ class ZT(commands.GroupCog, name="zt"):
         self.bot = bot
         self.joinable_networks = [JoinableNetwork(**network) for network in config.joinable_networks]
 
+    def get_network_by_id(self, id_to_find):
+        return next((network for network in self.joinable_networks if network.network_id == id_to_find), None)
+
     @app_commands.command()
     async def listnetworks(self, interaction: discord.Interaction):
         """Show the joinable ZeroTier networks"""
@@ -69,7 +72,7 @@ class ZT(commands.GroupCog, name="zt"):
             f"Received auth req from {interaction.user.name} ({interaction.user.id}) on network {network_id} with {member_id}"
         )
 
-        if not any(network_id == joinable.network_id for joinable in self.joinable_networks):
+        if not self.get_network_by_id(network_id):
             log.error("User-specified network ID is not in list of joinable networks")
             return await interaction.response.send_message(
                 "🛑 Please enter a network ID from the list of joinable ZeroTier networks."
@@ -95,7 +98,11 @@ class ZT(commands.GroupCog, name="zt"):
             if resp.status == 200:  # ✅ checked and tested
                 await interaction.followup.send("🟢 You have been authorized on the ZeroTier network.")
                 await self.post_auth_webhook(
-                    resp_json["name"], member_id, interaction.user, (await interaction.original_response()).jump_url
+                    resp_json["name"],
+                    member_id,
+                    self.get_network_by_id(network_id),
+                    interaction.user,
+                    (await interaction.original_response()).jump_url,
                 )
             elif resp.status == 401:  # ✅ checked and tested (triggers on invalid input)
                 await interaction.followup.send(f"🔴 {resp_json["error"]}")
@@ -111,7 +118,7 @@ class ZT(commands.GroupCog, name="zt"):
                 )
                 await webhookmsg.delete(delay=10)
 
-    async def post_auth_webhook(self, name, address, member: discord.Member, url):
+    async def post_auth_webhook(self, name, address, network, member: discord.Member, url):
         try:
             # Set up Webhook
             webhook = discord.Webhook.from_url(config.webhook_url, client=self.bot)
@@ -119,7 +126,7 @@ class ZT(commands.GroupCog, name="zt"):
             # Create embed
             embed = discord.Embed(
                 title="Self Member Authorization",
-                description=f"{member.mention} has authorized **{name}** on the ZeroTier network using this bot.",
+                description=f"{member.mention} has authorized **{name}** on the **{network}** network using this bot.",
                 color=0x00FF00,
                 timestamp=datetime.now(),
             )
@@ -127,6 +134,7 @@ class ZT(commands.GroupCog, name="zt"):
             # Add fields
             embed.add_field(name="Name", value=name, inline=True)
             embed.add_field(name="ID/Address", value=address, inline=True)
+            embed.add_field(name="Network", value=network, inline=True)
 
             embed.set_author(name=member.name, icon_url=member.avatar.url, url=url)
 
