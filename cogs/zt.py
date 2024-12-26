@@ -69,6 +69,12 @@ class ZT(commands.GroupCog, name="zt"):
             f"Received auth req from {interaction.user.name} ({interaction.user.id}) on network {network_id} with {member_id}"
         )
 
+        if not any(network_id == joinable.network_id for joinable in self.joinable_networks):
+            log.error("User-specified network ID is not in list of joinable networks")
+            return await interaction.response.send_message(
+                "🛑 Please enter a network ID from the list of joinable ZeroTier networks."
+            )
+
         await interaction.response.defer()
 
         api_url = config.ztnet_api_url
