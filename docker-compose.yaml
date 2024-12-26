@@ -11,3 +11,13 @@ services:
         target: /app/config.py
         read_only: true
     restart: unless-stopped
+    develop:
+      watch:
+        - action: sync+restart
+          path: .
+          target: /app
+          ignore:
+            - ./requirements.txt
+            - ./.git
+        - action: rebuild
+          path: ./requirements.txt
