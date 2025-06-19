@@ -1,14 +1,14 @@
 # ZeroAuth Discord Bot
 
-Authorization helper for friends in our ZeroTier network
+Authorization helper for friends in our ZeroTier network <br>
+
+Currently supports the ZeroTier Central API. There is an [older commit/version that supports ZTNET](https://github.com/jerichosy/ZeroAuth-Discord-Bot/tree/5542062d87133049539ee843a77de4602bcd05eb) instead.
 
 ### Setup
 
 1. Clone/download this repo.
 
-2. Use a virtual environment (`python -m venv venv`) and install the dependencies using `pip install -r requirements.txt`
-
-3. Configuration of this bot is done by creating a `config.py` file in the root directory where the bot is with the following template:
+2. Configuration of this bot is done by creating a `config.py` file in the root of the repo with the following template:
 
 ```python
 # Discord Bot
@@ -26,4 +26,5 @@ zt_ctrl_api_token = "" # your ZT Ctrl API access token
 zt_ctrl_api_url = "" # your ZT Ctrl API url with `/api/v1` at the end
 ```
 
-4. Run the bot using `python bot.py`
+3. Use a virtual environment with `python -m venv venv` and install the dependencies using `pip install -r requirements.txt`. Then, run the bot using `python bot.py`. <br>
+Alternatively, use Docker and run with `docker compose up`.
