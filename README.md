@@ -22,9 +22,8 @@ joinable_networks = [
     {"name": "", "network_id": ""}, # your ZeroTier network name and 16-digit network ID
     # add more dict for more networks
 ]
-ztnet_api_token = "" # your ZTNET Rest API access token
-ztnet_api_url = "" # your ZTNET Rest API url with `/api/v1` at the end
-ztnet_orgid = "" # your ZTNET network's organization ID
+zt_ctrl_api_token = "" # your ZT Ctrl API access token
+zt_ctrl_api_url = "" # your ZT Ctrl API url with `/api/v1` at the end
 ```
 
 4. Run the bot using `python bot.py`

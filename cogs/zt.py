@@ -62,11 +62,11 @@ class ZT(commands.GroupCog, name="zt"):
     ):
         """Authorize yourself on the ZeroTier network"""
         # NOTE: This does leak memberIds to other members in the Discord server. We can avoid this by using a modal.
-        # ? If we allow admins to auth members through here instead of ZTNET, add a name arg to the coommand.
+        # ? If we allow admins to auth members through here instead of the ZT Ctrl, add a name arg to the coommand.
         #   We must also maintain a list of admins's Discord IDs in the config file.
         # * Test for invalid inputs (if possible) if changing input strategy
 
-        # https://ztnet.network/Rest%20Api/Organization/Network-Members/modify-a-organization-network-member
+        # https://docs.zerotier.com/api/central/v1/#tag/network-member/operation/getNetworkMember
 
         log.info(
             f"Received auth req from {interaction.user.name} ({interaction.user.id}) on network {network_id} with {member_id}"
@@ -80,12 +80,17 @@ class ZT(commands.GroupCog, name="zt"):
 
         await interaction.response.defer()
 
-        api_url = config.ztnet_api_url
-        orgid = config.ztnet_orgid
-        headers = {"x-ztnet-auth": config.ztnet_api_token}
-        payload = {"name": f"{interaction.user.name}-{member_id}", "authorized": True}
+        api_url = config.zt_ctrl_api_url
+        # The format of the auth headers is seen here: https://docs.zerotier.com/api/central/examples/
+        headers = {"Authorization": f"token {config.zt_ctrl_api_token}"}
+        payload = {
+            "name": f"{interaction.user.name}-{member_id}",
+            "config": {
+                "authorized": True,
+            },
+        }
         async with self.bot.session.post(
-            f"{api_url}/org/{orgid}/network/{network_id}/member/{member_id}", headers=headers, json=payload
+            f"{api_url}/network/{network_id}/member/{member_id}", headers=headers, json=payload
         ) as resp:
             log.info(f"Status: {resp.status} {resp.reason}")
 
